@@ -141,7 +141,7 @@ def validcomp(n):
 
 def sanitize(eq):
     right = False
-    eq = list(filter(None, eq.replace(" ", "").replace('x', '𝓍').replace("-", "+-").replace("=", "+=+").strip("+").split("+")))
+    eq = list(filter(None, eq.replace(" ", "").replace('X', '𝓍').replace('x', '𝓍').replace("-", "+-").replace("=", "+=+").strip("+").split("+")))
     i = 0
     for n in eq:
         if n == '=':
@@ -172,8 +172,11 @@ def gcd(n1, n2):
     return (gcd(n2, n1 % n2))
 
 def frac(n1, n2):
+    sign = -1 if (n1 < 0) ^ (n2 < 0) else 1
+    n1 = n1 if n1 >= 0 else -n1
+    n2 = n2 if n2 >= 0 else -n2
     if n1 % n2 == 0:
-        return (f"{(n1/n2):g}")
+        return (sign * n1/n2, 1)
     g = gcd(n1,n2)
 
     n1 = n1 // g
@@ -181,17 +184,40 @@ def frac(n1, n2):
     if n2 < 0:
         n1 = -n1
         n2 = -n2
+    return (sign * n1,n2)
+
+def fracstr(n1, n2):
+    (n1, n2) = frac(n1, n2)
+    if n2 == 1:
+        return (f"{n1:g}")
+    if len(str(n1/n2).split('.')[1]) <= 2:
+        return (f"{n1/n2:g}")
     return (f"{n1:g}/{n2:g}")
 
+#𝓍𝒾√
 def sqrt(n):
-    pass
+    i = 10
+    while i*i < n:
+        i = i * 10
+
+    for i in range(i, 1, -1):
+        if (n % (i*i) == 0):
+            if n / (i*i) == 1:
+                return (i, "")
+            return (i, f"√{n / (i*i):g}")
+    if n == 1:
+        return (1, "")
+    return (1, f"√{n:g}")
 
 def solve1(coef):
     print("The solution is:")
-    if coef[0] == 0:
+    if not 0 in coef.keys() or coef[0] == 0:
         print("𝓍 = 0")
     else:
-        print("𝓍 = " + frac(-coef[0], coef[1]))
+        print("𝓍 = " + fracstr(-coef[0], coef[1]))
+
+def simplifyFrac():
+    pass
 
 def solve2(coef):
     a = 0 if not 2 in coef.keys() else coef[2]
@@ -203,16 +229,45 @@ def solve2(coef):
     if delta < 0:
         print("Discriminant is strictly negative, I can't solve for the moment.") #𝒾
     elif delta == 0:
-        print(f"Discriminant is zero, the solution is:\n{frac(-b, 2*a)}")
+        print("Discriminant is zero, the solution is:\n𝓍 = " + fracstr(-b, 2*a))
     else:
         print("Discriminant is strictly positive, the two solutions are:")
-        print(f"({-b:g} - √{delta:g}) / {2*a:g}")
-        print(f"({-b:g} + √{delta:g}) / {2*a:g}")
+        n, sq = sqrt(delta)
+        if sq == "":
+            print("𝓍1 = " + fracstr(-b-n, 2*a))
+            print("𝓍2 = " + fracstr(-b+n, 2*a))
+        else:
+            a1, a2 = frac(-b, 2*a)
+            b1, b2 = frac(n, 2*a)
+            if b1 != 1:
+                sq = f"{b1:g}{sq}"
+            if (a1 == 0):
+                if (b2 == 1):
+                    print("𝓍1 = -"+sq)
+                    print("𝓍2 =  "+sq)
+                else:
+                    print("𝓍1 = -"+sq+f" / {b2:g}")
+                    print("𝓍2 =  "+sq+f" / {b2:g}")
+            elif (a2 == b2):
+                if (b2 == 1):
+                    print(f"𝓍1 = {a1:g}-"+sq)
+                    print(f"𝓍2 = {a1:g}+"+sq)
+                else:
+                    print(f"𝓍1 = ({a1:g}-"+sq+f") / {b2:g}")
+                    print(f"𝓍2 = ({a1:g}+"+sq+f") / {b2:g}")
+            else:
+                if b2 != 1:
+                    if b1 != 1:
+                        sq = "("+sq+f") / {b2:g}"
+                    else:
+                        sq = sq+f"/{b2:g}"
+                print(f"𝓍1 = {a1:g}/{a2:g} - "+sq)
+                print(f"𝓍2 = {a1:g}/{a2:g} + "+sq)
 
 def main():
     eq = sys.argv[1]
+    print(eq)
     eq = sanitize(eq)
-    #print(eq)
     if eq == False: return
     coef = coefficients(eq)
     d = degree(coef)
