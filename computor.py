@@ -96,9 +96,9 @@ def degree(coef):
 def check(coef, d):
     if d == 0:
         if 0 not in coef.keys() or coef[0] == 0:
-            print("This equation is always true.")
+            print("𝓍 = 𝓍\nThis equation is always true.")
         else:
-            print("This equation has no solution.")
+            print(reduced(coef) + "\nThis equation has no solution.")
         return (False)
     return (True)
 
