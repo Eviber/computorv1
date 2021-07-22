@@ -261,8 +261,12 @@ def solve2(coef):
                         sq = "("+sq+f") / {b2:g}"
                     else:
                         sq = sq+f"/{b2:g}"
-                print(f"𝓍1 = {a1:g}/{a2:g} - "+sq)
-                print(f"𝓍2 = {a1:g}/{a2:g} + "+sq)
+                if a2 != 1:
+                    print(f"𝓍1 = {a1:g}/{a2:g} - "+sq)
+                    print(f"𝓍2 = {a1:g}/{a2:g} + "+sq)
+                else:
+                    print(f"𝓍1 = {a1:g} - "+sq)
+                    print(f"𝓍2 = {a1:g} + "+sq)
 
 def main():
     eq = sys.argv[1]
