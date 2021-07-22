@@ -172,7 +172,10 @@ def gcd(n1, n2):
     return (gcd(n2, n1 % n2))
 
 def frac(n1, n2):
-    sign = -1 if (n1 < 0) ^ (n2 < 0) else 1
+    while '.' in f"{n1:g}" or '.' in f"{n2:g}":
+        n1 = n1 * 10
+        n2 = n2 * 10
+    sign = -1 if ((n1 < 0) ^ (n2 < 0)) else 1
     n1 = n1 if n1 >= 0 else -n1
     n2 = n2 if n2 >= 0 else -n2
     if n1 % n2 == 0:
@@ -219,54 +222,63 @@ def solve1(coef):
 def simplifyFrac():
     pass
 
+def solve2nonzero(a, b, c, delta):
+    negative = (delta < 0)
+    if negative:
+        delta = -delta
+    n, sq = sqrt(delta)
+    if negative:
+        sq = '𝒾' + sq
+    if sq == "":
+        print("𝓍1 = " + fracstr(-b-n, 2*a))
+        print("𝓍2 = " + fracstr(-b+n, 2*a))
+    else:
+        a1, a2 = frac(-b, 2*a)
+        b1, b2 = frac(n, 2*a)
+        if b1 != 1:
+            sq = f"{b1:g}{sq}"
+        if (a1 == 0):
+            if (b2 == 1):
+                print("𝓍1 = -"+sq)
+                print("𝓍2 =  "+sq)
+            else:
+                print("𝓍1 = -"+sq+f" / {b2:g}")
+                print("𝓍2 =  "+sq+f" / {b2:g}")
+        elif (a2 == b2):
+            if (b2 == 1):
+                print(f"𝓍1 = {a1:g}-"+sq)
+                print(f"𝓍2 = {a1:g}+"+sq)
+            else:
+                print(f"𝓍1 = ({a1:g}-"+sq+f") / {b2:g}")
+                print(f"𝓍2 = ({a1:g}+"+sq+f") / {b2:g}")
+        else:
+            if b2 != 1:
+                if b1 != 1:
+                    sq = "("+sq+f") / {b2:g}"
+                else:
+                    sq = sq+f"/{b2:g}"
+            if a2 != 1:
+                print(f"𝓍1 = {a1:g}/{a2:g} - "+sq)
+                print(f"𝓍2 = {a1:g}/{a2:g} + "+sq)
+            else:
+                print(f"𝓍1 = {a1:g} - "+sq)
+                print(f"𝓍2 = {a1:g} + "+sq)
+
 def solve2(coef):
     a = 0 if not 2 in coef.keys() else coef[2]
     b = 0 if not 1 in coef.keys() else coef[1]
     c = 0 if not 0 in coef.keys() else coef[0]
     delta = b*b-4*a*c
-    print(f"a = {a} ; b = {b}  ; c = {c}")
+    print(f"a = {fracstr(a, 1)} ; b = {fracstr(b,1)}  ; c = {fracstr(c, 1)}")
     print(f"delta = {delta}")
     if delta < 0:
-        print("Discriminant is strictly negative, I can't solve for the moment.") #𝒾
+        print("Discriminant is strictly negative, the two solutions are:") #𝒾
+        solve2nonzero(a,b,c,delta)
     elif delta == 0:
         print("Discriminant is zero, the solution is:\n𝓍 = " + fracstr(-b, 2*a))
     else:
         print("Discriminant is strictly positive, the two solutions are:")
-        n, sq = sqrt(delta)
-        if sq == "":
-            print("𝓍1 = " + fracstr(-b-n, 2*a))
-            print("𝓍2 = " + fracstr(-b+n, 2*a))
-        else:
-            a1, a2 = frac(-b, 2*a)
-            b1, b2 = frac(n, 2*a)
-            if b1 != 1:
-                sq = f"{b1:g}{sq}"
-            if (a1 == 0):
-                if (b2 == 1):
-                    print("𝓍1 = -"+sq)
-                    print("𝓍2 =  "+sq)
-                else:
-                    print("𝓍1 = -"+sq+f" / {b2:g}")
-                    print("𝓍2 =  "+sq+f" / {b2:g}")
-            elif (a2 == b2):
-                if (b2 == 1):
-                    print(f"𝓍1 = {a1:g}-"+sq)
-                    print(f"𝓍2 = {a1:g}+"+sq)
-                else:
-                    print(f"𝓍1 = ({a1:g}-"+sq+f") / {b2:g}")
-                    print(f"𝓍2 = ({a1:g}+"+sq+f") / {b2:g}")
-            else:
-                if b2 != 1:
-                    if b1 != 1:
-                        sq = "("+sq+f") / {b2:g}"
-                    else:
-                        sq = sq+f"/{b2:g}"
-                if a2 != 1:
-                    print(f"𝓍1 = {a1:g}/{a2:g} - "+sq)
-                    print(f"𝓍2 = {a1:g}/{a2:g} + "+sq)
-                else:
-                    print(f"𝓍1 = {a1:g} - "+sq)
-                    print(f"𝓍2 = {a1:g} + "+sq)
+        solve2nonzero(a,b,c,delta)
 
 def main():
     eq = sys.argv[1]
