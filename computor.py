@@ -2,6 +2,9 @@
 
 import sys
 
+def debug(*s):
+    print(*s)
+
 def pargs():
     print(f"Arguments count: {len(sys.argv)}")
     for i, arg in enumerate(sys.argv):
@@ -24,16 +27,18 @@ def validnumber(s):
             break
     return(i == len(s) - 1)
 
+from decimal import Decimal
+
 def parsenum(n):
     val = 1
     if not '𝓍' in n:
         c = 0
-        val = float(n)
+        val = Decimal(n)
     else:
         if n[0] == '-' and n[1] == '𝓍':
-            val = -1
+            val = Decimal('-1')
         elif n[0] != '𝓍':
-            val = float(n.split("𝓍")[0])
+            val = Decimal(n.split("𝓍")[0])
         if not '^' in n:
             c = 1
         else:
@@ -164,22 +169,31 @@ def sanitize(eq):
         return False
     return eq
 
+import math
+
 def gcd(n1, n2):
     if n1 < n2:
         (n1,n2) = (n2,n1)
     if n1 % n2 == 0:
         return (n2)
+    if math.isnan(n2) or math.isnan(n1%n2):
+        raise Exception("NaN")
     return (gcd(n2, n1 % n2))
 
+def hasdecimals(n):
+    return (n != n.to_integral_value())
+
 def frac(n1, n2):
-    while '.' in f"{n1:g}" or '.' in f"{n2:g}":
-        n1 = n1 * 10
-        n2 = n2 * 10
+    n1 = Decimal(n1)
+    n2 = Decimal(n2)
+    while hasdecimals(n1) or hasdecimals(n2):
+        n1 = (n1 * 10).normalize()
+        n2 = (n2 * 10).normalize()
     sign = -1 if ((n1 < 0) ^ (n2 < 0)) else 1
     n1 = n1 if n1 >= 0 else -n1
     n2 = n2 if n2 >= 0 else -n2
     if n1 % n2 == 0:
-        return (sign * n1/n2, 1)
+        return (sign * n1/n2, Decimal(1))
     g = gcd(n1,n2)
 
     n1 = n1 // g
@@ -189,13 +203,20 @@ def frac(n1, n2):
         n2 = -n2
     return (sign * n1,n2)
 
+def remove_exponent(d):
+    return d.quantize(Decimal(1)) if d == d.to_integral() else d.normalize()
+
 def fracstr(n1, n2):
     (n1, n2) = frac(n1, n2)
-    if n2 == 1:
+    n1 = remove_exponent(n1)
+    n2 = remove_exponent(n2)
+    if n1 == 1:
         return (f"{n1:g}")
-    if len(str(n1/n2).split('.')[1]) <= 2:
-        return (f"{n1/n2:g}")
-    return (f"{n1:g}/{n2:g}")
+    f = f"{n1}/{n2}"
+    n = str(remove_exponent(n1/n2))
+    if len(f) > len(n):
+        return (n)
+    return (f)
 
 #𝓍𝒾√
 def sqrt(n):
@@ -235,8 +256,21 @@ def solve2nonzero(a, b, c, delta):
     else:
         a1, a2 = frac(-b, 2*a)
         b1, b2 = frac(n, 2*a)
+        if (a2 != b2):
+            if a2 < b2:
+                a1 = a1 * b2 / a2
+                a2 = a2 * b2 / a2
+            else:
+                f = fracstr(b1 * a2, b2)
+                b1 = b1 * a2 / b2
+                b2 = b2 * a2 / b2
         if b1 != 1:
-            sq = f"{b1:g}{sq}"
+            if not hasdecimals(b1) or len(f) > len(f"{b1:g}"):
+                sq = f"{b1:g}{sq}"
+            else:
+                sq = '(' + f + f"){sq}"
+        if b2 != 1:
+            sq = sq #TODO hmmm
         if (a1 == 0):
             if (b2 == 1):
                 print("𝓍1 = -"+sq)
@@ -244,25 +278,13 @@ def solve2nonzero(a, b, c, delta):
             else:
                 print("𝓍1 = -"+sq+f" / {b2:g}")
                 print("𝓍2 =  "+sq+f" / {b2:g}")
-        elif (a2 == b2):
+        else:
             if (b2 == 1):
-                print(f"𝓍1 = {a1:g}-"+sq)
+                print(f"𝓍1 = {a1}-"+sq)
                 print(f"𝓍2 = {a1:g}+"+sq)
             else:
                 print(f"𝓍1 = ({a1:g}-"+sq+f") / {b2:g}")
                 print(f"𝓍2 = ({a1:g}+"+sq+f") / {b2:g}")
-        else:
-            if b2 != 1:
-                if b1 != 1:
-                    sq = "("+sq+f") / {b2:g}"
-                else:
-                    sq = sq+f"/{b2:g}"
-            if a2 != 1:
-                print(f"𝓍1 = {a1:g}/{a2:g} - "+sq)
-                print(f"𝓍2 = {a1:g}/{a2:g} + "+sq)
-            else:
-                print(f"𝓍1 = {a1:g} - "+sq)
-                print(f"𝓍2 = {a1:g} + "+sq)
 
 def solve2(coef):
     a = 0 if not 2 in coef.keys() else coef[2]
@@ -270,7 +292,7 @@ def solve2(coef):
     c = 0 if not 0 in coef.keys() else coef[0]
     delta = b*b-4*a*c
     print(f"a = {fracstr(a, 1)} ; b = {fracstr(b,1)}  ; c = {fracstr(c, 1)}")
-    print(f"delta = {delta}")
+    print(f"delta = {fracstr(delta, 1)}")
     if delta < 0:
         print("Discriminant is strictly negative, the two solutions are:") #𝒾
         solve2nonzero(a,b,c,delta)

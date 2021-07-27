@@ -3,7 +3,7 @@
 from random import randint
 
 def r():
-    return (randint(-5, 5))
+    return (randint(-5000, 5000)/100)
 
 def randompoly():
     a = r()
