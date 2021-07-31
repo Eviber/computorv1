@@ -223,15 +223,14 @@ def sqrt(n):
     i = 10
     while i*i < n:
         i = i * 10
-
     for i in range(i, 1, -1):
         if (n % (i*i) == 0):
             if n / (i*i) == 1:
                 return (i, "")
-            return (i, f"√{n / (i*i):g}")
+            return (i, f"√{remove_exponent(n / (i*i))}")
     if n == 1:
         return (1, "")
-    return (1, f"√{n:g}")
+    return (1, f"√{remove_exponent(n)}")
 
 def solve1(coef):
     print("The solution is:")
