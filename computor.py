@@ -83,7 +83,7 @@ def reduced(coef):
                     red = red + " + "
             if n != 1 or c == 0:
                 if n == -1:
-                    red = "-"
+                    red = "-" if c != 0 else "-1"
                 else:
                     red = red + f"{n:g}"
             if c >= 1:
@@ -214,23 +214,27 @@ def fracstr(n1, n2):
         return (f"{n1:g}")
     f = f"{n1}/{n2}"
     n = str(remove_exponent(n1/n2))
-    if len(f) > len(n):
+    if len(f) >= len(n):
         return (n)
     return (f)
 
 #𝓍𝒾√
 def sqrt(n):
+    imaginary = ''
+    if (n < 0):
+        n = -n
+        imaginary = '𝒾'
     i = 10
     while i*i < n:
         i = i * 10
     for i in range(i, 1, -1):
         if (n % (i*i) == 0):
             if n / (i*i) == 1:
-                return (i, "")
-            return (i, f"√{remove_exponent(n / (i*i))}")
+                return (i, imaginary + "")
+            return (i, imaginary + f"√{remove_exponent(n / (i*i))}")
     if n == 1:
-        return (1, "")
-    return (1, f"√{remove_exponent(n)}")
+        return (1, imaginary + "")
+    return (1, imaginary + f"√{remove_exponent(n)}")
 
 def solve1(coef):
     print("The solution is:")
@@ -239,51 +243,42 @@ def solve1(coef):
     else:
         print("𝓍 = " + fracstr(-coef[0], coef[1]))
 
-def simplifyFrac():
-    pass
+def simplifyFrac(a, b, n, sq):
+    a1, a2 = frac(-b, 2*a)
+    b1, b2 = frac(n, 2*a)
+    if a2 < b2:
+        a1 = a1 * b2 / a2
+        a2 = a2 * b2 / a2
+    elif a2 > b2:
+        f = fracstr(b1 * a2, b2)
+        b1 = b1 * a2 / b2
+        b2 = b2 * a2 / b2
+    if b1 != 1:
+        if not hasdecimals(b1) or len(f) > len(f"{b1:g}"):
+            sq = f"{b1:g}{sq}"
+        else:
+            sq = f"({f}){sq}"
+    return (a1, b2, sq)
 
-def solve2nonzero(a, b, c, delta):
-    negative = (delta < 0)
-    if negative:
-        delta = -delta
+def solve2nonzero(a, b, delta):
     n, sq = sqrt(delta)
-    if negative:
-        sq = '𝒾' + sq
     if sq == "":
         print("𝓍1 = " + fracstr(-b-n, 2*a))
         print("𝓍2 = " + fracstr(-b+n, 2*a))
     else:
-        a1, a2 = frac(-b, 2*a)
-        b1, b2 = frac(n, 2*a)
-        if (a2 != b2):
-            if a2 < b2:
-                a1 = a1 * b2 / a2
-                a2 = a2 * b2 / a2
-            else:
-                f = fracstr(b1 * a2, b2)
-                b1 = b1 * a2 / b2
-                b2 = b2 * a2 / b2
-        if b1 != 1:
-            if not hasdecimals(b1) or len(f) > len(f"{b1:g}"):
-                sq = f"{b1:g}{sq}"
-            else:
-                sq = '(' + f + f"){sq}"
-        if b2 != 1:
-            sq = sq #TODO hmmm
-        if (a1 == 0):
-            if (b2 == 1):
-                print("𝓍1 = -"+sq)
-                print("𝓍2 =  "+sq)
-            else:
-                print("𝓍1 = -"+sq+f" / {b2:g}")
-                print("𝓍2 =  "+sq+f" / {b2:g}")
+        dividend, divisor, sq = simplifyFrac(a, b, n, sq)
+        print(dividend, divisor, sq)
+        if divisor != 1 and dividend != 0:
+            dividend = f"({dividend}"
+            sq = f"{sq})"
+        elif dividend != 0:
+            dividend = f"{dividend} "
+            sq = f" {sq}"
+        divisor = f" / {divisor}" if divisor != 1 else ""
+        if dividend == 0:
+            print(f"𝓍1 = -{sq}{divisor}\n𝓍2 =  {sq}{divisor}")
         else:
-            if (b2 == 1):
-                print(f"𝓍1 = {a1}-"+sq)
-                print(f"𝓍2 = {a1:g}+"+sq)
-            else:
-                print(f"𝓍1 = ({a1:g}-"+sq+f") / {b2:g}")
-                print(f"𝓍2 = ({a1:g}+"+sq+f") / {b2:g}")
+            print(f"𝓍1 = {dividend}-{sq}{divisor}\n𝓍2 = {dividend}+{sq}{divisor}")
 
 def solve2(coef):
     a = 0 if not 2 in coef.keys() else coef[2]
@@ -292,14 +287,14 @@ def solve2(coef):
     delta = b*b-4*a*c
     print(f"a = {fracstr(a, 1)} ; b = {fracstr(b,1)}  ; c = {fracstr(c, 1)}")
     print(f"delta = {fracstr(delta, 1)}")
-    if delta < 0:
-        print("Discriminant is strictly negative, the two solutions are:") #𝒾
-        solve2nonzero(a,b,c,delta)
-    elif delta == 0:
+    if delta == 0:
         print("Discriminant is zero, the solution is:\n𝓍 = " + fracstr(-b, 2*a))
+    elif delta < 0:
+        print("Discriminant is strictly negative, the two solutions are:") #𝒾
+        solve2nonzero(a,b,delta)
     else:
         print("Discriminant is strictly positive, the two solutions are:")
-        solve2nonzero(a,b,c,delta)
+        solve2nonzero(a,b,delta)
 
 def main():
     eq = sys.argv[1]
