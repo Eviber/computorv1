@@ -218,23 +218,51 @@ def fracstr(n1, n2):
         return (n)
     return (f)
 
+def addfactor(res, n):
+    if not n in res.keys():
+        res[n] = 1
+    else:
+        res[n] = res[n] + 1
+
+def primefactors(n):
+    res = {}
+    while n % 2 == 0:
+      addfactor(res, 2)
+      n = n / 2
+    for i in range(3,int(approx_sqrt(n))+1,2):
+        while (n % i == 0):
+            addfactor(res, i)
+            n = n / i
+            if n == 1:
+                return(res)
+    if n > 2:
+        addfactor(res, int(n))
+    return(res)
+
+def approx_sqrt(n):
+    s = n
+    while (s != (s+(n/s))/2):
+        s = (s+(n/s))/2
+    return (s)
+
 #𝓍𝒾√
 def sqrt(n):
     imaginary = ''
     if (n < 0):
         n = -n
         imaginary = '𝒾'
-    i = 10
-    while i*i < n:
-        i = i * 10
-    for i in range(i, 1, -1):
-        if (n % (i*i) == 0):
-            if n / (i*i) == 1:
-                return (i, imaginary + "")
-            return (i, imaginary + f"√{remove_exponent(n / (i*i))}")
-    if n == 1:
-        return (1, imaginary + "")
-    return (1, imaginary + f"√{remove_exponent(n)}")
+    multiple = 1
+    square = 1
+    factors = primefactors(n)
+    for f in factors.keys():
+        while factors[f] >= 2:
+            multiple = multiple * f
+            factors[f] = factors[f] - 2
+        if factors[f] == 1:
+            square = square * f
+    if square == 1:
+        return (multiple, imaginary)
+    return (multiple, imaginary + f"√{square}")
 
 def solve1(coef):
     print("The solution is:")
