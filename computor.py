@@ -226,6 +226,8 @@ def addfactor(res, n):
 
 def primefactors(n):
     res = {}
+    if (hasdecimals(n)):
+        return ({n: 1})
     while n % 2 == 0:
       addfactor(res, 2)
       n = n / 2
@@ -288,11 +290,44 @@ def simplifyFrac(a, b, n, sq):
             sq = f"({f}){sq}"
     return (a1, b2, sq)
 
+def dround(n):
+    return remove_exponent(n.quantize(Decimal("0.000001")))
+
+def getapprox(a, b, delta):
+    if delta >= 0:
+        a1 = (-b-approx_sqrt(delta))/(2*a)
+        a2 = (-b+approx_sqrt(delta))/(2*a)
+        if hasdecimals(a1) and len(str(remove_exponent(a1)).split('.')[1]) > 6:
+            a1 = f" ≈ {dround(a1)}"
+        else:
+            a1 = ""
+        if hasdecimals(a2) and len(str(remove_exponent(a2)).split('.')[1]) > 6:
+            a2 = f" ≈ {dround(a2)}"
+        else:
+            a2 = ""
+        return (a1, a2)
+    else:
+        realpart = f"{dround((-b)/(2*a))}"
+        tmp = dround(-approx_sqrt(-delta)/(2*a))
+        a1 = realpart + (f" + {tmp}𝒾" if (tmp >= 0) else f" - {-tmp}𝒾")
+        tmp = -tmp
+        a2 = realpart + (f" + {tmp}𝒾" if (tmp >= 0) else f" - {-tmp}𝒾")
+    if delta < 0 or (hasdecimals(a1) and len(str(remove_exponent(a1)).split('.')[1])) > 6:
+        a1 = f" ≈ {a1}"
+    else:
+        a1 = ""
+    if delta < 0 or (hasdecimals(a2) and len(str(remove_exponent(a2)).split('.')[1])) > 6:
+        a2 = f" ≈ {a2}"
+    else:
+        a2 = ""
+    return (a1, a2)
+
 def solve2nonzero(a, b, delta):
     n, sq = sqrt(delta)
+    approx1, approx2 = getapprox(a, b, delta)
     if sq == "":
-        print("𝓍1 = " + fracstr(-b-n, 2*a))
-        print("𝓍2 = " + fracstr(-b+n, 2*a))
+        print("𝓍1 = " + fracstr(-b-n, 2*a) + approx1)
+        print("𝓍2 = " + fracstr(-b+n, 2*a) + approx2)
     else:
         dividend, divisor, sq = simplifyFrac(a, b, n, sq)
         print(dividend, divisor, sq)
@@ -304,9 +339,9 @@ def solve2nonzero(a, b, delta):
             sq = f" {sq}"
         divisor = f" / {divisor}" if divisor != 1 else ""
         if dividend == 0:
-            print(f"𝓍1 = -{sq}{divisor}\n𝓍2 =  {sq}{divisor}")
+            print(f"𝓍1 = -{sq}{divisor}{approx1}\n𝓍2 =  {sq}{divisor}{approx2}")
         else:
-            print(f"𝓍1 = {dividend}-{sq}{divisor}\n𝓍2 = {dividend}+{sq}{divisor}")
+            print(f"𝓍1 = {dividend}-{sq}{divisor}{approx1}\n𝓍2 = {dividend}+{sq}{divisor}{approx2}")
 
 def solve2(coef):
     a = 0 if not 2 in coef.keys() else coef[2]
@@ -324,7 +359,7 @@ def solve2(coef):
         print("Discriminant is strictly positive, the two solutions are:")
         solve2nonzero(a,b,delta)
 
-def main():
+def main(): #TODO better handling of BEEG numbers (by approximating)
     eq = sys.argv[1]
     print(eq)
     eq = sanitize(eq)
