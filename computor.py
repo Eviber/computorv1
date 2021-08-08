@@ -210,7 +210,7 @@ def fracstr(n1, n2):
     (n1, n2) = frac(n1, n2)
     n1 = remove_exponent(n1)
     n2 = remove_exponent(n2)
-    if n1 == 1:
+    if n2 == 1:
         return (f"{n1:g}")
     f = f"{n1}/{n2}"
     n = str(remove_exponent(n1/n2))
@@ -330,7 +330,6 @@ def solve2nonzero(a, b, delta):
         print("𝓍2 = " + fracstr(-b+n, 2*a) + approx2)
     else:
         dividend, divisor, sq = simplifyFrac(a, b, n, sq)
-        print(dividend, divisor, sq)
         if divisor != 1 and dividend != 0:
             dividend = f"({dividend}"
             sq = f"{sq})"
