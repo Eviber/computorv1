@@ -28,6 +28,7 @@ def validnumber(s):
     return(i == len(s) - 1)
 
 from decimal import Decimal
+import decimal
 
 def parsenum(n):
     val = 1
@@ -169,15 +170,11 @@ def sanitize(eq):
         return False
     return eq
 
-import math
-
 def gcd(n1, n2):
     if n1 < n2:
         (n1,n2) = (n2,n1)
     if n1 % n2 == 0:
         return (n2)
-    if math.isnan(n2) or math.isnan(n1%n2):
-        raise Exception("NaN")
     return (gcd(n2, n1 % n2))
 
 def hasdecimals(n):
@@ -288,7 +285,7 @@ def simplifyFrac(a, b, n, sq):
             sq = f"{b1:g}{sq}"
         else:
             sq = f"({f}){sq}"
-    return (a1, b2, sq)
+    return (remove_exponent(a1), remove_exponent(b2), sq)
 
 def dround(n):
     return remove_exponent(n.quantize(Decimal("0.000001")))
@@ -297,11 +294,11 @@ def getapprox(a, b, delta):
     if delta >= 0:
         a1 = (-b-approx_sqrt(delta))/(2*a)
         a2 = (-b+approx_sqrt(delta))/(2*a)
-        if hasdecimals(a1) and len(str(remove_exponent(a1)).split('.')[1]) > 6:
+        if (hasdecimals(a1) and len(str(remove_exponent(a1)).split('.')[1]) > 6) or fast:
             a1 = f" ≈ {dround(a1)}"
         else:
             a1 = ""
-        if hasdecimals(a2) and len(str(remove_exponent(a2)).split('.')[1]) > 6:
+        if (hasdecimals(a2) and len(str(remove_exponent(a2)).split('.')[1]) > 6) or fast:
             a2 = f" ≈ {dround(a2)}"
         else:
             a2 = ""
@@ -309,22 +306,30 @@ def getapprox(a, b, delta):
     else:
         realpart = f"{dround((-b)/(2*a))}"
         tmp = dround(-approx_sqrt(-delta)/(2*a))
-        a1 = realpart + (f" + {tmp}𝒾" if (tmp >= 0) else f" - {-tmp}𝒾")
-        tmp = -tmp
-        a2 = realpart + (f" + {tmp}𝒾" if (tmp >= 0) else f" - {-tmp}𝒾")
-    if delta < 0 or (hasdecimals(a1) and len(str(remove_exponent(a1)).split('.')[1])) > 6:
+        if realpart != "0":
+            a1 = a2 = realpart
+            if tmp != 0:
+                a1 = a1 + (f" + {tmp}𝒾" if (tmp >= 0) else f" - {-tmp}𝒾")
+                a2 = a2 + (f" + {-tmp}𝒾" if (tmp < 0) else f" - {tmp}𝒾")
+        else:
+            a1, a2 = f"{tmp}𝒾", f"{-tmp}𝒾"
+    if (delta < 0 or (hasdecimals(a1) and len(str(remove_exponent(a1)).split('.')[1])) > 6) or fast:
         a1 = f" ≈ {a1}"
     else:
         a1 = ""
-    if delta < 0 or (hasdecimals(a2) and len(str(remove_exponent(a2)).split('.')[1])) > 6:
+    if (delta < 0 or (hasdecimals(a2) and len(str(remove_exponent(a2)).split('.')[1])) > 6) or fast:
         a2 = f" ≈ {a2}"
     else:
         a2 = ""
     return (a1, a2)
 
 def solve2nonzero(a, b, delta):
-    n, sq = sqrt(delta)
     approx1, approx2 = getapprox(a, b, delta)
+    if fast:
+        print("𝓍1" + approx1)
+        print("𝓍2" + approx2)
+        return
+    n, sq = sqrt(delta)
     if sq == "":
         print("𝓍1 = " + fracstr(-b-n, 2*a) + approx1)
         print("𝓍2 = " + fracstr(-b+n, 2*a) + approx2)
@@ -356,10 +361,21 @@ def solve2(coef):
         solve2nonzero(a,b,delta)
     else:
         print("Discriminant is strictly positive, the two solutions are:")
-        solve2nonzero(a,b,delta)
+        solve2nonzero(a,b,delta) 
+def usage():
+    print("usage: ./computor.py [-f | --fast] EQUATION")
 
-def main(): #TODO better handling of BEEG numbers (by approximating)
+def main():
+    global fast
+    fast = False
+    if not len(sys.argv) >= 2:
+        usage()
+        return
     eq = sys.argv[1]
+    if (sys.argv[1][0] == '-' and len(sys.argv) > 2):
+        if (sys.argv[1] == "-f" or sys.argv[1] == "--fast"):
+            fast = True
+        eq = sys.argv[2]
     print(eq)
     eq = sanitize(eq)
     if eq == False: return
@@ -378,7 +394,10 @@ def main(): #TODO better handling of BEEG numbers (by approximating)
     if d == 1:
         solve1(coef)
     elif d == 2:
-        solve2(coef)
+        try:
+            solve2(coef)
+        except decimal.InvalidOperation:
+                print("Error: values too extremes")
     elif d > 2:
         print(f"The polynomial degree is stricly greater than 2, I can't solve.")
 
