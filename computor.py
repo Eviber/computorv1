@@ -305,19 +305,21 @@ def getapprox(a, b, delta):
         return (a1, a2)
     else:
         realpart = f"{dround((-b)/(2*a))}"
-        tmp = dround(-approx_sqrt(-delta)/(2*a))
+        tmp = dround(approx_sqrt(-delta)/(2*a))
+        if tmp == 1:
+            tmp = ''
         if realpart != "0":
             a1 = a2 = realpart
             if tmp != 0:
-                a1 = a1 + (f" + {tmp}𝒾" if (tmp >= 0) else f" - {-tmp}𝒾")
-                a2 = a2 + (f" + {-tmp}𝒾" if (tmp < 0) else f" - {tmp}𝒾")
+                a1 = a1 + f" - {tmp}𝒾"
+                a2 = a2 + f" + {tmp}𝒾"
         else:
-            a1, a2 = f"{tmp}𝒾", f"{-tmp}𝒾"
-    if (delta < 0 or (hasdecimals(a1) and len(str(remove_exponent(a1)).split('.')[1])) > 6) or fast:
+            a1, a2 = f"-{tmp}𝒾", f"{tmp}𝒾"
+    if ((delta < 0 and ('.' in a1 or '/' in a1)) or delta >= 0 and (hasdecimals(a1) and len(str(remove_exponent(a1)).split('.')[1])) > 6) or fast:
         a1 = f" ≈ {a1}"
     else:
         a1 = ""
-    if (delta < 0 or (hasdecimals(a2) and len(str(remove_exponent(a2)).split('.')[1])) > 6) or fast:
+    if ((delta < 0 and ('.' in a2 or '/' in a2)) or delta >= 0 and (hasdecimals(a2) and len(str(remove_exponent(a2)).split('.')[1])) > 6) or fast:
         a2 = f" ≈ {a2}"
     else:
         a2 = ""
@@ -335,13 +337,26 @@ def solve2nonzero(a, b, delta):
         print("𝓍2 = " + fracstr(-b+n, 2*a) + approx2)
     else:
         dividend, divisor, sq = simplifyFrac(a, b, n, sq)
+        tmp = ''
         if divisor != 1 and dividend != 0:
-            dividend = f"({dividend}"
-            sq = f"{sq})"
+            tmp = fracstr(dividend, divisor)
+            if not '.' in tmp and not '/' in tmp:
+                dividend = tmp
+            else:
+                dividend = f"({dividend}"
+                sq = f"{sq})"
         elif dividend != 0:
             dividend = f"{dividend} "
             sq = f" {sq}"
-        divisor = f" / {divisor}" if divisor != 1 else ""
+        if divisor != 1:
+            if dividend == tmp:
+                divisor = f"/{divisor}"
+                dividend = f"{dividend} "
+                sq = f" {sq}"
+            else:
+                divisor = f" / {divisor}"
+        else:
+            divisor = ''
         if dividend == 0:
             print(f"𝓍1 = -{sq}{divisor}{approx1}\n𝓍2 =  {sq}{divisor}{approx2}")
         else:
@@ -361,7 +376,7 @@ def solve2(coef):
         solve2nonzero(a,b,delta)
     else:
         print("Discriminant is strictly positive, the two solutions are:")
-        solve2nonzero(a,b,delta) 
+        solve2nonzero(a,b,delta)
 def usage():
     print("usage: ./computor.py [-f | --fast] EQUATION")
 
