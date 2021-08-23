@@ -64,7 +64,7 @@ def solve2nonzero(a, b, delta):
         tmp = ""
         if divisor != 1 and dividend != 0:
             tmp = fracstr(dividend, divisor)
-            if not "." in tmp and not "/" in tmp:
+            if "." not in tmp and "/" not in tmp:
                 dividend = tmp
             else:
                 dividend = f"({dividend}"
@@ -82,17 +82,17 @@ def solve2nonzero(a, b, delta):
         else:
             divisor = ""
         if dividend == 0:
-            print(f"𝓍1 = -{sq}{divisor}{approx1}\n𝓍2 =  {sq}{divisor}{approx2}")
+            print(f"𝓍1 = -{sq}{divisor}{approx1}")
+            print(f"𝓍2 =  {sq}{divisor}{approx2}")
         else:
-            print(
-                f"𝓍1 = {dividend}-{sq}{divisor}{approx1}\n𝓍2 = {dividend}+{sq}{divisor}{approx2}"
-            )
+            print(f"𝓍1 = {dividend}-{sq}{divisor}{approx1}")
+            print(f"𝓍2 = {dividend}+{sq}{divisor}{approx2}")
 
 
 def solve2(coef):
-    a = 0 if not 2 in coef.keys() else coef[2]
-    b = 0 if not 1 in coef.keys() else coef[1]
-    c = 0 if not 0 in coef.keys() else coef[0]
+    a = 0 if 2 not in coef.keys() else coef[2]
+    b = 0 if 1 not in coef.keys() else coef[1]
+    c = 0 if 0 not in coef.keys() else coef[0]
     delta = b * b - 4 * a * c
     print(f"a = {fracstr(a, 1)} ; b = {fracstr(b,1)}  ; c = {fracstr(c, 1)}")
     print(f"delta = {fracstr(delta, 1)}")
@@ -108,7 +108,7 @@ def solve2(coef):
 
 def solve1(coef):
     print("The solution is:")
-    if not 0 in coef.keys() or coef[0] == 0:
+    if 0 not in coef.keys() or coef[0] == 0:
         print("𝓍 = 0")
     else:
         print("𝓍 = " + fracstr(-coef[0], coef[1]))

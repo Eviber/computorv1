@@ -1,22 +1,22 @@
-def validcompnum(n, i, l):
+def validcompnum(n, i, nlen):
     starti = i
     if n[i] in "-":
         i = i + 1
-    while i < l and n[i] in "0123456789":
+    while i < nlen and n[i] in "0123456789":
         i = i + 1
-    if i < l and n[i] == ".":
+    if i < nlen and n[i] == ".":
         i = i + 1
-        if i == l or n[i] not in "0123456789":
+        if i == nlen or n[i] not in "0123456789":
             return False
-        while i < l and n[i] in "0123456789":
+        while i < nlen and n[i] in "0123456789":
             i = i + 1
-    if i < l and n[i] == "𝓍":
+    if i < nlen and n[i] == "𝓍":
         i = i + 1
-        if i < l and n[i] == "^":
+        if i < nlen and n[i] == "^":
             i = i + 1
-            if i == l or n[i] not in "0123456789":
+            if i == nlen or n[i] not in "0123456789":
                 return False
-            while i < l and n[i] in "0123456789":
+            while i < nlen and n[i] in "0123456789":
                 i = i + 1
     if starti == i:
         return False
@@ -25,16 +25,16 @@ def validcompnum(n, i, l):
 
 def validcomp(n):
     i = 0
-    l = len(n)
-    i = validcompnum(n, i, l)
+    nlen = len(n)
+    i = validcompnum(n, i, nlen)
     if not i:
         return False
-    while i < l and n[i] == "*":
+    while i < nlen and n[i] == "*":
         i = i + 1
-        if not i < l:
+        if not i < nlen:
             return False
-        i = validcompnum(n, i, l)
-    return i == l
+        i = validcompnum(n, i, nlen)
+    return i == nlen
 
 
 def sanitize(eq):
@@ -57,7 +57,7 @@ def sanitize(eq):
             if i == 0:
                 print(f"Error: invalid equation (nothing before equal sign)")
                 return False
-            if right == True:
+            if right:
                 print(f"Error: invalid equation (more than one equal sign)")
                 return False
             right = True

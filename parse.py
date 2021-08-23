@@ -3,7 +3,7 @@ from decimal import Decimal
 
 def parsenum(n):
     val = 1
-    if not "𝓍" in n:
+    if "𝓍" not in n:
         c = 0
         val = Decimal(n)
     else:
@@ -11,7 +11,7 @@ def parsenum(n):
             val = Decimal("-1")
         elif n[0] != "𝓍":
             val = Decimal(n.split("𝓍")[0])
-        if not "^" in n:
+        if "^" not in n:
             c = 1
         else:
             c = int(n[n.index("^") + 1])
@@ -22,7 +22,7 @@ def coefficients(eq):
     coef = {}
     right = False
     for n in eq:
-        if not "=" in n:
+        if "=" not in n:
             val = 1
             exp = 0
             for part in n.split("*"):

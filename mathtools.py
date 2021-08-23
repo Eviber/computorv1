@@ -52,7 +52,7 @@ def fracstr(n1, n2):
 
 
 def addfactor(res, n):
-    if not n in res.keys():
+    if n not in res.keys():
         res[n] = 1
     else:
         res[n] = res[n] + 1

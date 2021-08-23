@@ -2,7 +2,7 @@
 
 import sys
 
-import parsing
+import parse
 from sanitize import sanitize
 import solver
 from polytools import *
@@ -29,15 +29,15 @@ def main():
     eq, fast = getargs()
     print(eq)
     eq = sanitize(eq)
-    if eq == False:
+    if not eq:
         return
-    coef = parsing.coefficients(eq)
+    coef = parse.coefficients(eq)
     d = degree(coef)
     if not edge_case(coef, d):
         return
     red = reduced(coef)
     if red[0] == "-":
-        coef = parsing.coefficients(sanitize("0 = " + red.split("=")[0].strip()))
+        coef = parse.coefficients(sanitize("0 = " + red.split("=")[0].strip()))
         red = reduced(coef)
     # print(eq)
     print(f"Reduced form: {red}")
