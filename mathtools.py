@@ -1,4 +1,6 @@
+# Decimal is a special type that is better suited for base 10 numbers
 from decimal import Decimal
+import re
 
 
 def gcd(n1, n2):
@@ -10,15 +12,16 @@ def gcd(n1, n2):
 
 
 def hasdecimals(n):
-    return n != n.to_integral_value()
+    return '.' in '{0:f}'.format(remove_exponent(n))
+    #return n != n.to_integral_value()
 
 
 def frac(n1, n2):
     n1 = Decimal(n1)
     n2 = Decimal(n2)
     while hasdecimals(n1) or hasdecimals(n2):
-        n1 = (n1 * 10).normalize()
-        n2 = (n2 * 10).normalize()
+        n1 = (n1 * 10)
+        n2 = (n2 * 10)
     sign = -1 if ((n1 < 0) ^ (n2 < 0)) else 1
     n1 = n1 if n1 >= 0 else -n1
     n2 = n2 if n2 >= 0 else -n2
@@ -35,7 +38,14 @@ def frac(n1, n2):
 
 
 def remove_exponent(d):
-    return d.quantize(Decimal(1)) if d == d.to_integral() else d.normalize()
+    s = '{0:f}'.format(d)
+    if '.' in s:
+        if Decimal(s.split('.')[1]) == 0:
+            s = s.split('.')[0]
+        else:
+            s = re.sub(r"(\d+\.\d*?)0+$", r"\1", s)
+    return Decimal(s)
+    #return d.quantize(Decimal(1)) if d == d.to_integral() else d.normalize()
 
 
 def fracstr(n1, n2):
@@ -45,7 +55,7 @@ def fracstr(n1, n2):
     if n2 == 1:
         return f"{n1:g}"
     f = f"{n1}/{n2}"
-    n = str(remove_exponent(n1 / n2))
+    n = '{0:f}'.format(remove_exponent(n1 / n2))
     if len(f) >= len(n):
         return n
     return f
@@ -121,4 +131,12 @@ def simplifyFrac(a, b, n, sq):
 
 
 def dround(n):
-    return remove_exponent(n.quantize(Decimal("0.000001")))
+    s = '{0:f}'.format(n)
+    if '.' in s:
+        parts = s.split('.')
+        n = Decimal(parts[0] + '.' + parts[1][:6])
+        tmp = "0." + parts[1][6:]
+        if Decimal(tmp) >= 0.5:
+            n = n + Decimal("0.000001")
+    return remove_exponent(n)
+    #return remove_exponent(n.quantize(Decimal("0.000001")))

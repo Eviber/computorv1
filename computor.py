@@ -27,7 +27,7 @@ def main():
         usage()
         return
     eq, fast = getargs()
-    print(eq)
+    print("Input: " + eq)
     eq = sanitize(eq)
     if not eq:
         return
