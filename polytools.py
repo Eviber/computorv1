@@ -17,7 +17,7 @@ def reduced(coef):
                 else:
                     red = red + f"{n:g}"
             if c >= 1:
-                red = red + "𝓍"
+                red = red + "X"
             if c > 1:
                 red = red + f"^{c}"
     red = red + " = 0"
@@ -33,7 +33,7 @@ def degree(coef):
 def edge_case(coef, d):
     if d == 0:
         if 0 not in coef.keys() or coef[0] == 0:
-            print("𝓍 = 𝓍\nThis equation is always true.")
+            print("X = X\nThis equation is always true.")
         else:
             print(reduced(coef) + "\nThis equation has no solution.")
         return False

@@ -3,14 +3,14 @@ from decimal import Decimal
 
 def parsenum(n):
     val = 1
-    if "𝓍" not in n:
+    if "X" not in n:
         c = 0
         val = Decimal(n)
     else:
-        if n[0] == "-" and n[1] == "𝓍":
+        if n[0] == "-" and n[1] == "X":
             val = Decimal("-1")
-        elif n[0] != "𝓍":
-            val = Decimal(n.split("𝓍")[0])
+        elif n[0] != "X":
+            val = Decimal(n.split("X")[0])
         if "^" not in n:
             c = 1
         else:

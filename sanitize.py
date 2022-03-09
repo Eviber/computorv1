@@ -10,7 +10,7 @@ def validcompnum(n, i, nlen):
             return False
         while i < nlen and n[i] in "0123456789":
             i = i + 1
-    if i < nlen and n[i] == "𝓍":
+    if i < nlen and n[i] == "X":
         i = i + 1
         if i < nlen and n[i] == "^":
             i = i + 1
@@ -43,8 +43,7 @@ def sanitize(eq):
         filter(
             None,
             eq.replace(" ", "")
-            .replace("X", "𝓍")
-            .replace("x", "𝓍")
+            .replace("x", "X")
             .replace("-", "+-")
             .replace("=", "+=+")
             .strip("+")
