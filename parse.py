@@ -14,7 +14,7 @@ def parsenum(n):
         if "^" not in n:
             c = 1
         else:
-            c = int(n[n.index("^") + 1])
+            c = Decimal(n[n.index("^") + 1:])
     return (val, c)
 
 

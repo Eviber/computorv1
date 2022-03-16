@@ -1,4 +1,5 @@
 from mathtools import *
+import decimal
 
 
 def getapprox(a, b, delta):

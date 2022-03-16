@@ -41,6 +41,8 @@ def main():
         red = reduced(coef)
     # print(eq)
     print(f"Reduced form: {red}")
+    if not validpoly(red):
+        return
     d = degree(coef)
     print(f"Polynomial degree: {d}")
     solver.solve(d, coef, fast)

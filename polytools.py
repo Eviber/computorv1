@@ -1,6 +1,8 @@
+import re
+
 def reduced(coef):
     red = ""
-    for c in range(max(coef.keys()), -1, -1):
+    for c in sorted(coef, reverse=True):
         if not (c in coef.keys()):
             continue
         n = coef[c]
@@ -16,10 +18,10 @@ def reduced(coef):
                     red = "-" if c != 0 else "-1"
                 else:
                     red = red + f"{n:g}"
-            if c >= 1:
+            if c != 0:
                 red = red + "X"
-            if c > 1:
-                red = red + f"^{c}"
+                if c != 1:
+                    red = red + f"^{c}"
     red = red + " = 0"
     return red
 
@@ -36,5 +38,12 @@ def edge_case(coef, d):
             print("X = X\nThis equation is always true.")
         else:
             print(reduced(coef) + "\nThis equation has no solution.")
+        return False
+    return True
+
+
+def validpoly(red):
+    if re.findall("X\^\d\.\d", red):
+        print("Not a valid polynomial: can't have a non integer as a power of X.")
         return False
     return True

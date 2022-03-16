@@ -1,7 +1,11 @@
+import re
+
 def validcompnum(n, i, nlen):
     starti = i
     if n[i] in "-":
         i = i + 1
+        if i == nlen:
+            return False
     while i < nlen and n[i] in "0123456789":
         i = i + 1
     if i < nlen and n[i] == ".":
@@ -18,6 +22,12 @@ def validcompnum(n, i, nlen):
                 return False
             while i < nlen and n[i] in "0123456789":
                 i = i + 1
+            if i < nlen and n[i] == ".":
+                i = i + 1
+                if i == nlen or n[i] not in "0123456789":
+                    return False
+                while i < nlen and n[i] in "0123456789":
+                    i = i + 1
     if starti == i:
         return False
     return i
@@ -39,13 +49,13 @@ def validcomp(n):
 
 def sanitize(eq):
     right = False
+    eq = eq.replace("x", "X").replace("ˆ", "^")
+    eq = re.sub(r"(?<![\dxX]) | (?![\dxX])", "", eq) # whitespaces
+    eq = re.sub(r"([X\d])-", r"\1+-", eq) # differ minus from negative numbers
     eq = list(
         filter(
             None,
-            eq.replace(" ", "")
-            .replace("x", "X")
-            .replace("-", "+-")
-            .replace("=", "+=+")
+            eq.replace("=", "+=+")
             .strip("+")
             .split("+"),
         )
