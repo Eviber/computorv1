@@ -25,16 +25,16 @@ def getargs():
 def main():
     if not len(sys.argv) >= 2:
         usage()
-        return
+        sys.exit(1)
     eq, fast = getargs()
     print("Input: " + eq)
     eq = sanitize(eq)
     if not eq:
-        return
+        sys.exit(1)
     coef = parse.coefficients(eq)
     d = degree(coef)
     if not edge_case(coef, d):
-        return
+        sys.exit(1)
     red = reduced(coef)
     if red[0] == "-":
         coef = parse.coefficients(sanitize("0 = " + red.split("=")[0].strip()))
@@ -42,10 +42,10 @@ def main():
     # print(eq)
     print(f"Reduced form: {red}")
     if not validpoly(red):
-        return
+        sys.exit(1)
     d = degree(coef)
     print(f"Polynomial degree: {d}")
-    solver.solve(d, coef, fast)
+    sys.exit(solver.solve(d, coef, fast))
 
 
 if __name__ == "__main__":

@@ -50,15 +50,15 @@ def getapprox(a, b, delta):
     return (a1, a2)
 
 
-def solve2nonzero(a, b, delta):
+def solve2nonzero(a, b, delta, stepstr):
     approx1, approx2 = getapprox(a, b, delta)
     if fast:
-        print("𝓍1" + approx1)
+        print(stepstr + "\n𝓍1" + approx1)
         print("𝓍2" + approx2)
         return
     n, sq = sqrt(delta)
     if sq == "":
-        print("𝓍1 = " + fracstr(-b - n, 2 * a) + approx1)
+        print(stepstr + "\n𝓍1 = " + fracstr(-b - n, 2 * a) + approx1)
         print("𝓍2 = " + fracstr(-b + n, 2 * a) + approx2)
     else:
         dividend, divisor, sq = simplifyFrac(a, b, n, sq)
@@ -83,10 +83,10 @@ def solve2nonzero(a, b, delta):
         else:
             divisor = ""
         if dividend == 0:
-            print(f"𝓍1 = -{sq}{divisor}{approx1}")
+            print(stepstr + f"\n𝓍1 = -{sq}{divisor}{approx1}")
             print(f"𝓍2 =  {sq}{divisor}{approx2}")
         else:
-            print(f"𝓍1 = {dividend}-{sq}{divisor}{approx1}")
+            print(stepstr + f"\n𝓍1 = {dividend}-{sq}{divisor}{approx1}")
             print(f"𝓍2 = {dividend}+{sq}{divisor}{approx2}")
 
 
@@ -95,16 +95,16 @@ def solve2(coef):
     b = 0 if 1 not in coef.keys() else coef[1]
     c = 0 if 0 not in coef.keys() else coef[0]
     delta = b * b - 4 * a * c
-    print(f"a = {fracstr(a, 1)} ; b = {fracstr(b,1)}  ; c = {fracstr(c, 1)}")
-    print(f"delta = {fracstr(delta, 1)}")
+    stepstr = f"a = {fracstr(a, 1)} ; b = {fracstr(b,1)}  ; c = {fracstr(c, 1)}"
+    stepstr = stepstr + f"\ndelta = {fracstr(delta, 1)}"
     if delta == 0:
-        print("Discriminant is zero, the solution is:\n𝓍 = " + fracstr(-b, 2 * a))
+        print(stepstr + f"\nDiscriminant is zero, the solution is:\n𝓍 = " + fracstr(-b, 2 * a))
     elif delta < 0:
-        print("Discriminant is strictly negative, the two solutions are:")  # 𝒾
-        solve2nonzero(a, b, delta)
+        stepstr = stepstr + "\nDiscriminant is strictly negative, the two solutions are:" # 𝒾
+        solve2nonzero(a, b, delta, stepstr)
     else:
-        print("Discriminant is strictly positive, the two solutions are:")
-        solve2nonzero(a, b, delta)
+        stepstr = stepstr + "\nDiscriminant is strictly positive, the two solutions are:"
+        solve2nonzero(a, b, delta, stepstr)
 
 
 def solve1(coef):
@@ -125,5 +125,15 @@ def solve(d, coef, f):
             solve2(coef)
         except decimal.InvalidOperation:
             print("Error: values too extremes")
+            return 1
+        except KeyboardInterrupt:
+            if not fast:
+                print("\nCaught keyboard interrupt, switching to fast mode.")
+                return solve(d, coef, True)
+            else:
+                print("\nCaught keyboard interrupt, exiting")
+                return 130
     elif d > 2:
         print(f"The polynomial degree is stricly greater than 2, I can't solve.")
+        return 1
+    return 0

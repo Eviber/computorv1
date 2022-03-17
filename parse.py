@@ -1,4 +1,5 @@
 from decimal import Decimal
+import mathtools
 
 
 def parsenum(n):
@@ -32,11 +33,11 @@ def coefficients(eq):
             if right:
                 val = -val
             if exp in coef.keys():
-                coef[exp] = coef[exp] + val
+                coef[exp] = mathtools.remove_exponent(coef[exp] + val)
                 if coef[exp] == 0:
                     del coef[exp]
             else:
-                coef[exp] = val
+                coef[exp] = mathtools.remove_exponent(val)
         else:
             right = True
     return coef

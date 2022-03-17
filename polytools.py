@@ -1,4 +1,5 @@
 import re
+import mathtools
 
 def reduced(coef):
     red = ""
@@ -17,7 +18,7 @@ def reduced(coef):
                 if n == -1:
                     red = "-" if c != 0 else "-1"
                 else:
-                    red = red + f"{n:g}"
+                    red = red + f"{mathtools.remove_exponent(n):g}"
             if c != 0:
                 red = red + "X"
                 if c != 1:
