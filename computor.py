@@ -15,10 +15,14 @@ def usage():
 def getargs():
     fast = False
     eq = sys.argv[1]
-    if sys.argv[1][0] == "-" and len(sys.argv) > 2:
+    if len(sys.argv) > 2:
         if sys.argv[1] == "-f" or sys.argv[1] == "--fast":
             fast = True
-        eq = sys.argv[2]
+            eq = sys.argv[2]
+        else:
+            if sys.argv[2] == "-f" or sys.argv[2] == "--fast":
+                fast = True
+            eq = sys.argv[1]
     return eq, fast
 
 
