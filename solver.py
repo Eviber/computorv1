@@ -119,7 +119,11 @@ def solve(d, coef, f):
     global fast
     fast = f
     if d == 1:
-        solve1(coef)
+        try:
+            solve1(coef)
+        except decimal.InvalidOperation:
+            print("Error: values too extremes")
+            return 1
     elif d == 2:
         try:
             solve2(coef)
